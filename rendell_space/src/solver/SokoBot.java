@@ -16,6 +16,6 @@ public class SokoBot {
 
 
 
-    return sd.SokobanDpSolver(state).toString();
+    return sd.SokobanDpSolver(state);
   }
 }

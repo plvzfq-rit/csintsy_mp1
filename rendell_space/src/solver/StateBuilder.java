@@ -98,7 +98,7 @@ public class StateBuilder {
 
                 variations[0] = sb.charAt(playerIndex);
                 variations[1] = sb.charAt(moveIndex);
-                variations[2] = (movePlusIndex >= lower && (moveIndex - lower) % w != 0) ? sb.charAt(movePlusIndex) : '#';
+                variations[2] = (movePlusIndex >= lower) ? sb.charAt(movePlusIndex) : '#';
                 break;
             case 'd':
                 moveIndex = playerIndex + w;
@@ -114,7 +114,7 @@ public class StateBuilder {
 
                 variations[0] = sb.charAt(playerIndex);
                 variations[1] = sb.charAt(moveIndex);
-                variations[2] = (movePlusIndex <= upper && (moveIndex - 1) % w != 0) ? sb.charAt(movePlusIndex) : '#';
+                variations[2] = (movePlusIndex <= upper) ? sb.charAt(movePlusIndex) : '#';
         }
 
         boolean pushed = false;

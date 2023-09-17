@@ -12,7 +12,7 @@ public class SokoBot {
 
     StateBuilder sb = new StateBuilder();
     SokobanDp sd = new SokobanDp();
-    String state = sb.createState(mapData, itemsData);
+    State state = sb.createState(mapData, itemsData);
 
 
 

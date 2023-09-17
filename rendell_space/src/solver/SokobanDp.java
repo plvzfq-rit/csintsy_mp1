@@ -33,17 +33,10 @@ public class SokobanDp {
 
     public String SokobanDpSolver(String state) {
         if (sc.isStateSolved(state)) return new String();
-        if (sc.isStateUnsolvable(state)) {
-            // memo.put(state, null);
-            return null;
-        }
+        if (sc.isStateUnsolvable(state)) return null;
 
         if (visited.contains(state)) return null;
         else visited.add(state);
-
-        // if (memo.containsKey(state)) {
-        //     return memo.get(state);
-        // }
 
         String u = SokobanDpSolver(sb.moveState(state, 'u'));
         String d = SokobanDpSolver(sb.moveState(state, 'd'));
@@ -51,27 +44,19 @@ public class SokobanDp {
         String r = SokobanDpSolver(sb.moveState(state, 'r'));
 
         if (u != null) {
-            // memo.put(state, u.insert(0, 'u'));
-            // return memo.get(state);
             return "u" + u;
         }
         if (d != null) {
-            // memo.put(state, d.insert(0, 'u'));
-            // return memo.get(state);
             return "d" + d;
         }
         if (l != null) {
-            // memo.put(state, l.insert(0, 'u'));
-            // return memo.get(state);
             return "l" + l;
         }
         if (r != null) {
-            // memo.put(state, r.insert(0, 'u'));
-            // return memo.get(state);
             return "r" + r;
         }
-
-        // memo.put(state, null);
+        
         return null;
     }
 }
+

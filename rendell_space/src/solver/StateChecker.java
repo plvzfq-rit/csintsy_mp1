@@ -13,7 +13,6 @@ public class StateChecker {
         char[] state_ = state.toCharArray();
         int h = Character.getNumericValue(state_[0]);
         int w = Character.getNumericValue(state_[1]);
-        int lower = 2;
         int upper = h * w + 1;
 
         for (int i = 2; i < upper; i++) {

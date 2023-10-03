@@ -18,13 +18,13 @@ public class HeuristicCalculator {
     //     this.duplicateCostMatrix = originalCostMatrix.clone();
     // }
 
-    public double computeNaiveHeuristic (ArrayList<Coordinate> boxes, ArrayList<Coordinate> goals) {
+    public static double computeNaiveHeuristic (List<Coordinate> boxes, List<Coordinate> goals) {
         int boxSize = boxes.size();
         int goalSize = goals.size();
         double cost = 0;
         for (int i = 0; i < boxSize; i++) {
             for (int j = 0; j < goalSize; j++) {
-                cost += Coordinate.computeDistance(boxes.get(i), goals.get(j));
+                cost += ManhattanCalculator.computeDistance(boxes.get(i), goals.get(j));
             }
         }
         return cost / (boxSize * goalSize);

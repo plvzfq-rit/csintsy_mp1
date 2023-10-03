@@ -1,5 +1,35 @@
 package solver;
 
 public enum Directions {
-    UP, DOWN, LEFT, RIGHT
+    UP, DOWN, LEFT, RIGHT;
+
+    public int[] asXYArray () {
+        switch (this) {
+            case UP:
+                return new int[]{0,-1};
+            case DOWN:
+                return new int[]{0, 1};
+            case LEFT:
+                return new int[]{-1, 0};
+            case RIGHT:
+                return new int[]{1, 0};
+            default:
+                return null;
+        }
+    }
+
+    public String asCommand () {
+        switch (this) {
+            case UP:
+                return "u";
+            case DOWN:
+                return "d";
+            case LEFT:
+                return "l";
+            case RIGHT:
+                return "r";
+            default:
+                return null;
+        }
+    }
 }

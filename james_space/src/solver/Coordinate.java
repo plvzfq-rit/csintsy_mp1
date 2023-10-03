@@ -1,7 +1,5 @@
 package solver;
 
-import java.lang.Math;
-
 public class Coordinate {
     private int x;
     private int y;
@@ -11,35 +9,27 @@ public class Coordinate {
         this.y = y;
     }
 
-    public Coordinate (Coordinate c, Directions d) {
+    public Coordinate(Coordinate c, Directions d) {
         if (d == Directions.UP) {
             this.x = c.getX();
             this.y = c.getY() - 1;
-        }
-        else if (d == Directions.DOWN) {
+        } else if (d == Directions.DOWN) {
             this.x = c.getX();
             this.y = c.getY() + 1;
-        }
-        else if (d == Directions.LEFT) {
+        } else if (d == Directions.LEFT) {
             this.x = c.getX() - 1;
             this.y = c.getY();
-        }
-        else if (d == Directions.RIGHT) {
+        } else if (d == Directions.RIGHT) {
             this.x = c.getX() + 1;
             this.y = c.getY();
         }
     }
 
-    public int getX () {
+    public int getX() {
         return this.x;
     }
 
-    public int getY () {
+    public int getY() {
         return this.y;
-    }
-
-    public static double computeDistance (Coordinate c1, Coordinate c2) {
-        return Math.sqrt((c1.getX() + c2.getX()) * c1.getX() + c2.getX() + 
-                         (c1.getY() + c2.getY()) * c1.getY() + c2.getY());
     }
 }

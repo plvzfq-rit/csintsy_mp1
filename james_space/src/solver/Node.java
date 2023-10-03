@@ -1,0 +1,74 @@
+package solver;
+
+import java.util.*;
+
+public class Node {
+    double totalCost;
+    double heuristicValue;
+    double cumulativeCost;
+    NodeState nodeState;
+    Node parentNode;
+    // List<Node> childNodes;
+    Directions direction;
+
+    public Node (Coordinate         playerCoordinates,
+                 List<Coordinate>   boxCoordinates,
+                 List<Coordinate>   goalCoordinates,
+                 char[][]           mapData,
+                 char[][]           itemsData) {
+        this.heuristicValue = HeuristicCalculator.computeNaiveHeuristic(boxCoordinates, goalCoordinates);
+        this.cumulativeCost = 0;
+        this.totalCost = 0;
+        this.nodeState = new NodeState(playerCoordinates, boxCoordinates);
+        this.parentNode = null;
+        // this.childNodes = NodeFunctions.generateChildNodes(this, mapData, itemsData, goalCoordinates);
+        this.direction = null;
+    }
+
+    public Node (Node               parentNode,
+                 Coordinate         playerCoordinates, 
+                 List<Coordinate>   boxCoordinates, 
+                 List<Coordinate>   goalCoordinates, 
+                 Directions         direction,
+                 char[][]           mapData,
+                 char[][]           itemsData) {
+        this.heuristicValue = HeuristicCalculator.computeNaiveHeuristic(boxCoordinates, goalCoordinates);
+        this.cumulativeCost = parentNode.getCumulativeCost() + 1;
+        this.totalCost = this.heuristicValue + this.cumulativeCost;
+        this.nodeState = new NodeState(playerCoordinates, boxCoordinates);
+        this.parentNode = parentNode;
+        // this.childNodes = NodeFunctions.generateChildNodes(this, mapData, itemsData, goalCoordinates);
+        this.direction = direction;
+    }
+
+    public Coordinate getPlayerCoordinate () {
+        return this.nodeState.playerCoordinate;
+    }
+
+    public List<Coordinate> getBoxCoordinates () {
+        return this.nodeState.boxCoordinates;
+    }
+
+    public double getCumulativeCost () {
+        return this.cumulativeCost;
+    }
+
+    public double getTotalCost () {
+        return this.totalCost;
+    }
+
+    public NodeState getNodeState () {
+        return this.nodeState;
+    }
+
+    public String getPath () {
+        if (parentNode == null) {
+            return this.direction.asCommand();
+        }
+        return this.parentNode.getPath() + this.direction.asCommand();
+    }
+
+    // public List<Node> getChildNodes () {
+    //     return this.childNodes;
+    // }
+}

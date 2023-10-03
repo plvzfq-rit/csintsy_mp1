@@ -1,128 +1,104 @@
 package solver;
 
 import java.util.*;
-import java.lang.*;
+
+/*
+ * LEGEND:
+ * @ - player - in itemsData
+ * # - wall - in mapData
+ * $ - box - in itemsData
+ * . - goal square - in mapData
+ */
 
 public class SokoBot {
+    Coordinate initialPlayerCoordinates;
+    List<Coordinate> initialBoxCoordinates = new ArrayList<Coordinate>();
+    List<Coordinate> goalCoordinates = new ArrayList<Coordinate>();
 
   public String solveSokobanPuzzle(int width, int height, char[][] mapData, char[][] itemsData) {
-    return "lrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlr";
+    this.initializeBot(width, height, mapData, itemsData);
+    return aStarSearch(width, height, mapData, itemsData);
   }
 
-  /*
-   * Generates goal data.
-   * 
-   * @param width   width of the map
-   * @param height  height of the map
-   * @param mapData 2D character array containing data about immovable objects in the map
-   * 
-   * @return a 2D character array representing the goal state
-   */
-  public char[][] generateGoalData (int width, int height, char[][] mapData) {
-    char[][] goalData = mapData;
+  public void initializeBot (int width, int height, char[][] mapData, char[][] itemsData) {
     for (int i = 0; i < height; i++) {
-      for (int j = 0; j < width; j++) {
-        goalData[i][j] = (goalData[i][j] == '.')? '*' : goalData[i][j];
-      }
+        for (int j = 0; j < width; j++) {
+            if (itemsData[i][j] == '@') {
+                this.initialPlayerCoordinates = new Coordinate(i, j);
+            }
+            if (itemsData[i][j] == '$') {
+                this.initialBoxCoordinates.add(new Coordinate(i, j));
+            }
+            if (mapData[i][j] == '.') {
+                this.goalCoordinates.add(new Coordinate(i, j));
+            }
+        }
     }
-    return goalData;
   }
 
-  /*
-   * Gets the players coordinates.
-   * 
-   * @param width     width of the map
-   * @param height    height of the map
-   * @param itemsData 2D character array containing data about movable objects on the map
-   * 
-   * @return an integer array <coordinates> where <coordinates = {x-coordinate, y-coordinate}>
-   */
-  public int[] getPlayerCoordinates (int width, int height, char[][] itemsData) {
-    int[] coordinates = {0, 0};
-    while (itemsData[coordinates[0]][coordinates[1]] != '@' && coordinates[0] < height) {
-      while(itemsData[coordinates[0]][coordinates[1]] != '@' && coordinates[1] < width) {
-        coordinates[1]++;
+  public String aStarSearch (int width, int height, char[][] mapData, char[][] itemsData) {
+    PriorityQueue<Node> frontier = new PriorityQueue<Node>(new NodeComparator());
+    HashSet<NodeState> visitedMemory = new HashSet<NodeState>();
+    HashMap<NodeState, Double> visitedNodeToCost = new HashMap<NodeState, Double>();
+    HashSet<NodeState> frontierMemory = new HashSet<NodeState>();
+    Node currentNode;
+    // List<Node> viableNodes;
+    String path = null;
+    frontier.add(new Node (this.initialPlayerCoordinates, 
+                           this.initialBoxCoordinates, 
+                           this.goalCoordinates, 
+                           mapData, 
+                           itemsData));
+                           
+    while (!frontier.isEmpty() && path == null) {
+      currentNode = frontier.poll();
+      // frontierMemory.add(currentNode.getNodeState());
+      if (isGoal(currentNode.getBoxCoordinates())) {
+        path = currentNode.getPath();
       }
-      if (itemsData[coordinates[0]][coordinates[1]] != '@') {
-        coordinates[0]++;
-        coordinates[1] = 0;
-      }
-    }
-    return coordinates;
-  }
+      else {
+        visitedMemory.add(currentNode.getNodeState());
+        // frontierMemory.remove(currentNode.getNodeState());
+        double costToNext = currentNode.getCumulativeCost() + 1;
+        List<Node> childNodes = NodeFunctions.generateChildNodes(currentNode, mapData, itemsData, goalCoordinates);
+        // viableNodes = new ArrayList<Node>();
+        for (Node childNode : childNodes) {
+          // if (visitedMemory.contains(childNode.getNodeState()) && costToNext < )
+          boolean nodeInFrontier = frontierMemory.contains(childNode.getNodeState());
+          boolean nodeInVisited = visitedMemory.contains(childNode.getNodeState());
 
-  /*
-   * Checks which moves are possible in which cardinal directions.
-   * 
-   * 
-   */
-  public String checkMove (int width, int height, char[][] mapData, char[][] itemsData, int[] coordinates) {
-    String rString = "";
-    int row = coordinates[0];
-    int col = coordinates[1];
+          if (nodeInFrontier) {
+            if (visitedNodeToCost.get(childNode.getNodeState()) != null) {
+              if (visitedNodeToCost.get(childNode.getNodeState()) > costToNext) {
+                frontierMemory.remove(childNode.getNodeState());
+                nodeInFrontier = !nodeInFrontier;
+              }
+            }
+          }
 
-    // checks in the northern direction
-    if (row >= 1) {
-      if (mapData[row - 1][col] == ' ') {
-        rString += "u";
-      }
-      else if (itemsData[row - 1][col] == '$' && row >= 2) {
-        if (mapData[row - 2][col] == ' ') {
-          rString += "u";
-        }
-      } 
-    }
+          if (nodeInVisited) {
+            if (visitedNodeToCost.get(childNode.getNodeState()) != null) {
+              if (visitedNodeToCost.get(childNode.getNodeState()) > costToNext) {
+                visitedMemory.remove(childNode.getNodeState());
+                nodeInVisited = !nodeInVisited;
+              }
+            }
+          }
 
-    // checks in the southern direction
-    if (row < height - 1) {
-      if (mapData[row + 1][col] == ' ') {
-        rString += "d";
-      }
-      else if (itemsData[row + 1][col] == '$' && row < height - 2) {
-        if (mapData[row + 2][col] == ' ') {
-          rString += "d";
-        }
-      }
-    }
-
-    // checks in the western direction
-    if (col >= 1) {
-      if (mapData[row][col - 1] == ' ') {
-        rString += "l";
-      }
-      else if (itemsData[row][col - 1] == '$' && col >= 2) {
-        if (mapData[row][col - 2] == ' ') {
-          rString += "l";
+          if (!nodeInFrontier && !nodeInVisited) {
+            visitedNodeToCost.put(childNode.getNodeState(), costToNext);
+            frontierMemory.add(childNode.getNodeState());
+            frontier.add(childNode);
+          }
         }
       }
     }
-
-    // checks in the eastern direction
-    if (col < width - 1) {
-      if (mapData[row][col + 1] == ' ') {
-        rString += 'r';
-      }
-      else if (itemsData[row][col + 1] == '$' && col < width - 2) {
-        if (mapData[row][col + 2] == ' ') {
-          rString += "r";
-        } 
-      }
-    }
-
-    return rString;
-  }
-
-  /*
-   * Models moving behaviour.
-   */
-  public char[][] move (int width, int height, char[][] ) {
     
+    return path;
   }
-  /*
-   * Models a naive "backtracking" solution.
-   */
-  public String naiveSolution () {
 
-    return "";
+  public boolean isGoal (List<Coordinate> boxCoordinates) {
+    return new HashSet<Coordinate>(boxCoordinates).equals(new HashSet<Coordinate>(this.goalCoordinates));
   }
+
 }

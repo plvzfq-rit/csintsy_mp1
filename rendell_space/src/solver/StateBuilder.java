@@ -10,6 +10,7 @@ package solver;
 
 import java.lang.StringBuffer;
 import java.lang.StringBuilder;
+import java.util.ArrayList;
 
 public class StateBuilder {
     // public static void main(String[] args) {
@@ -166,4 +167,31 @@ public class StateBuilder {
 
         System.out.print("\n\n");
     } 
+
+    public String getBoxPositions(State state) {
+        String data = state.data;
+        String pos = "";
+        for (int i = 0; i < data.length(); i++) {
+            if ("$*.@0".contains(Character.toString(data.charAt(i)))) {
+                pos += String.format("%03d", i);
+            }
+        }
+        
+        return pos;
+    }
+
+    // public ArrayList<State> generateInvalidStates(State state) {
+    //     String data = state.data;
+    //     ArrayList<Integer> possibleInd = new ArrayList<>();
+    //     for (int i = 0; i < data.length(); i++) {
+    //         if (data.charAt(i) == ' ') {
+    //             String c =  String.format("%c%c%c%c", data.charAt(i - state.w), data.charAt(i - 1), data.charAt(i + state.w), data.charAt(i + 1));
+
+    //             if (c.contains("##") || (c.charAt(0) == '#' && c.charAt(3) == '#')) 
+    //                 possibleInd.add(i);
+    //         }
+    //     }
+
+
+    // }
 }

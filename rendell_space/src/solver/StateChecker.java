@@ -10,17 +10,17 @@ public class StateChecker {
     }
 
     public boolean isStateUnsolvable(State state) {
-        char[] state_ = state.data.toCharArray();
         int h = state.h;
         int w = state.w;
         int upper = h * w - 1;
+        String data = state.data;
 
         for (int i = 0; i < upper; i++) {
-            if (state_[i] == '$') {
-                char[] c = { state_[i - w], state_[i - 1], state_[i + w], state_[i + 1] };
-                String check = new String(c);
+            if (data.charAt(i) == '$') {
+                // char[] c = { state_[i - w], state_[i - 1], state_[i + w], state_[i + 1] };
+                String c =  String.format("%c%c%c%c", data.charAt(i - w), data.charAt(i - 1), data.charAt(i + w), data.charAt(i + 1));
 
-                if (check.contains("##") || (c[0] == '#' && c[3] == '#')) 
+                if (c.contains("##") || (c.charAt(0) == '#' && c.charAt(3) == '#')) 
                     return true;
             }
         }

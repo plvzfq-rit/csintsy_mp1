@@ -1,215 +1,344 @@
 package solver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 
 public class SokoBot {
-  private HashMap<String, Boolean> visitedStates = new HashMap<>();
-
+  private static List<int[]> walls = new ArrayList<>();
+  private static List<int[]> goals = new ArrayList<>();
+  private static String solution = "";
   public String solveSokobanPuzzle(int width, int height, char[][] mapData, char[][] itemsData) {
-    return dfsSolve(width, height, mapData, itemsData);
+    int[][] gameState = convertToGameState(width, height, mapData, itemsData);
+    posOfWalls(gameState);
+    posOfGoals(gameState);
+
+    BFS(gameState);
+    
+    return solution;
   }
 
-  public String dfsSolve(int width, int height, char[][] mapData, char[][] itemsData) {
-    StringBuilder solString = new StringBuilder();
-    if(isSolved(width, height, mapData, itemsData))
-      return "";
+  public static int[][] convertToGameState(int width, int height, char[][] mapData, char[][] itemsData) {
+    int[][] layout = new int[height][width];
+    for (int irow = 0; irow < height; irow++) {
+      for (int icol = 0; icol < width; icol++) {
+        char char1 = mapData[irow][icol];
+        char char2 = itemsData[irow][icol];
 
-    ArrayList<Character> possibleMoves = generatePossibleMoves(width, height, mapData, itemsData);
-
-    for(Character move : possibleMoves) {
-      System.out.println("MOVE: " + move + "\n");
-      applyMove(width, height, mapData, itemsData, move);
-
-      if(isValidState(width, height, mapData, itemsData) && !isVisited(mapData, itemsData)) {
-        System.out.println("MARKED AS VISITED");
-        markVisited(mapData, itemsData);
-
-        String result = dfsSolve(width, height, mapData, itemsData);
-
-        if(!result.isEmpty()) {
-        //   System.out.println("SOLUTION MADE");
-        //   solString.insert(0, move);
-        //   solString.append(result);
-        //   System.out.println(solString.toString());
-          // return solString.toString();
-          return move + result;
-        }
-      }
-      undoMove(width, height, mapData, itemsData, move);
-    }
-    return "";
-  }
-
-  public boolean isSolved(int width, int height, char[][] mapData, char[][] itemsData) {
-    // check if already solved
-    for(int i = 0; i < height; i++) {
-      for(int j = 0; j < width; j++) {
-        if(mapData[i][j] == '.' && itemsData[i][j] != '$') {
-          return false;
+        if (char1 == ' ' && char2 == ' ') {
+          layout[irow][icol] = 0; // free space
+        } else if (char1 == '#') {
+          layout[irow][icol] = 1; // wall
+        } else if (char2 == '@') {
+          layout[irow][icol] = 2; // player
+        } else if (char2 == '$') {
+          layout[irow][icol] = 3; // box
+        } else if (char1 == '.') {
+          layout[irow][icol] = 4; // goal
+        } 
+        if (char1 == '$' && char2 == '.') {
+          layout[irow][icol] = 5; // box on goal
         }
       }
     }
-    return true;
+    return layout;
   }
 
-  public ArrayList<Character> generatePossibleMoves(int width, int height, char[][] mapData, char[][] itemsData) {
-    ArrayList<Character> validMoves = new ArrayList<>();
-    int x = -1; // player's x coordinate
-    int y = -1; // player's y coordinate
-
-    // find player's position and initialize valid moves
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            if (itemsData[i][j] == '@') {
-                x = j;
-                y = i;
-                validMoves.addAll(Arrays.asList('u','d','l','r'));
-            }
-        }
-    }
-
-    if (x >= 0 && y >= 0 && x < width && y < height) {
-      if (y - 1 >= 0 && mapData[y - 1][x] == '#') {
-        validMoves.remove(Character.valueOf('u'));
-      }
-      if (y + 1 < height && mapData[y + 1][x] == '#') {
-    validMoves.remove(Character.valueOf('d'));
-      }
-      if (x - 1 >= 0 && mapData[y][x - 1] == '#') {
-        validMoves.remove(Character.valueOf('l'));
-      }
-      if (x + 1 < width && mapData[y][x + 1] == '#') {
-        validMoves.remove(Character.valueOf('r'));
-      }
-    }
-    for(Character c : validMoves) System.out.print(c);
-    System.out.println("\n");
-    return validMoves;
-  }
-
-  public void applyMove(int width, int height, char[][] mapData, char[][] itemsData, char move) {
-    int x = -1; // player's x coordinate
-    int y = -1; // player's y coordinate
-
-    // find player's position and initialize valid moves
-    for (int i = 0; i < height; i++) {
-      for (int j = 0; j < width; j++) {
-        if (itemsData[i][j] == '@') {
-          x = j;
-          y = i;
+  public static void posOfWalls(int[][] gameState) {
+    for (int i = 0; i < gameState.length; i++) {
+      for (int j = 0; j < gameState[i].length; j++) {
+        if (gameState[i][j] == 1) {
+          walls.add(new int[]{i, j});
         }
       }
     }
-    if (x >= 0 && y >= 0 && x < width && y < height) {
-      int newX = x;
-      int newY = y;
-      if (move == 'u') {
-        newY--;
-      } else if (move == 'd') {
-        newY++;
-      } else if (move == 'l') {
-        newX--;
-      } else if (move == 'r') {
-        newX++;
-      }
-      if (newX >= 0 && newY >= 0 && newX < width && newY < height) {
-        if (mapData[newY][newX] != '#') {
-          if (itemsData[newY][newX] == '$') {
-            // Move a box if there's one in front.
-            int boxX = newX;
-            int boxY = newY;
-            if (move == 'u') {
-              boxY--;
-            } else if (move == 'd') {
-              boxY++;
-            } else if (move == 'l') {
-              boxX--;
-            } else if (move == 'r') {
-              boxX++;
-            }
+  }
 
-            if (boxX >= 0 && boxY >= 0 && boxX < width && boxY < height && itemsData[boxY][boxX] == ' ') {
-              itemsData[boxY][boxX] = '$';
-              itemsData[newY][newX] = '@';
-              itemsData[y][x] = ' ';
-            }
-          } else {
-            // Move the player without pushing a box.
-            itemsData[newY][newX] = '@';
-            itemsData[y][x] = ' ';
+  public static List<int[]> posOfBoxes(int[][] gameState) {
+    List<int[]> boxPositions = new ArrayList<>();
+
+    for (int i = 0; i < gameState.length; i++) {
+      for (int j = 0; j < gameState[i].length; j++) {
+        if (gameState[i][j] == 3 || gameState[i][j] == 5) {
+          boxPositions.add(new int[]{i, j});
+        }
+      }
+    }
+
+    return boxPositions;
+  }
+
+  public static void posOfGoals(int[][] gameState) {
+    for (int i = 0; i < gameState.length; i++) {
+      for (int j = 0; j < gameState[i].length; j++) {
+        if (gameState[i][j] == 4) {
+          goals.add(new int[]{i, j});
+        }
+      }
+    }
+  }
+
+  public static int[] posOfPlayer(int[][] gameState) {
+    for (int i = 0; i < gameState.length; i++) {
+      for (int j = 0; j < gameState[i].length; j++) {
+        if (gameState[i][j] == 2) {
+          return new int[]{i, j};
+        }
+      }
+    }
+    
+  // if the player is not found
+  return new int[]{-1, -1};
+  }
+
+  public static boolean isEndState(List<int[]> box) {
+    Collections.sort(box, Comparator.comparingInt(arr -> arr[0]));
+    Collections.sort(goals, Comparator.comparingInt(arr -> arr[0]));
+    return box.equals(goals);
+  }
+
+  public static List<List<Object>> legalActions(int[] posPlayer, List<int[]> posBox) {
+      List<List<Object>> allActions = new ArrayList<>();
+      allActions.add(new ArrayList<>(List.of(-1, 0, 'u', 'U')));
+      allActions.add(new ArrayList<>(List.of(1, 0, 'd', 'D')));
+      allActions.add(new ArrayList<>(List.of(0, -1, 'l', 'L')));
+      allActions.add(new ArrayList<>(List.of(0, 1, 'r', 'R')));
+
+      int xPlayer = posPlayer[0];
+      int yPlayer = posPlayer[1];
+
+      List<List<Object>> legalActions = new ArrayList<>();
+
+      for (List<Object> action : allActions) {
+        int x1 = xPlayer + (int) action.get(0);
+        int y1 = yPlayer + (int) action.get(1);
+
+        if (containsPosition(posBox, x1, y1)) { // the move was a push
+          action.remove(2); // drop the little letter
+        } else {
+          action.remove(3); // drop the upper letter
+        }
+
+        if (isLegalAction(action, posPlayer, posBox)) {
+          legalActions.add(new ArrayList<>(action));
+        }
+      }
+
+      return legalActions;
+  }
+
+  public static boolean isLegalAction(List<Object> action, int[] posPlayer, List<int[]> posBox) {
+    int xPlayer = posPlayer[0];
+    int yPlayer = posPlayer[1];
+    int x1, y1;
+    if (Character.isUpperCase((char) action.get(2))) { // the move was a push
+      x1 = xPlayer + 2 * (int) action.get(0);
+      y1 = yPlayer + 2 * (int) action.get(1);
+    } else {
+      x1 = xPlayer + (int) action.get(0);
+      y1 = yPlayer + (int) action.get(1);
+    }
+    return !containsPosition(posBox, x1, y1) && !containsPosition(walls, x1, y1);
+  }
+
+  public static boolean containsPosition(List<int[]> posWalls, int x, int y) {
+    for (int[] position : posWalls) {
+      if (position[0] == x && position[1] == y) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static boolean boxInWalls(int[] posBox) {
+    for (int[] position : walls) {
+      if (position[0] == posBox[0] && position[1] == posBox[1]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static boolean boxInGoals(int[] posBox) {
+    for (int[] position : goals) {
+      if (position[0] == posBox[0] && position[1] == posBox[1]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static boolean inBox(int[] pos, List<int[]> posBox) {
+    for (int[] position : posBox) {
+      if (position[0] == pos[0] && position[1] == pos[1]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static GameState updateState(int[] posPlayer, List<int[]> posBox, List<Object> action) {
+    int xPlayer = posPlayer[0];
+    int yPlayer = posPlayer[1];
+    int[] newPosPlayer = {xPlayer + (int) action.get(0), yPlayer + (int) action.get(1)};
+    
+    List<int[]> newPosBox = posBox;
+
+    if(Character.isUpperCase((char) action.get(2))) {
+      newPosBox.remove(newPosPlayer);
+      int[] updatePlayer = {xPlayer + 2 * (int) action.get(0), yPlayer + 2 * (int) action.get(1)};
+      newPosBox.add(updatePlayer);
+    }
+
+    return new GameState(newPosPlayer, newPosBox);
+  }
+
+  public static boolean isFailed(List<int[]> posBox) {
+    List<List<Integer>> rotatePattern = Arrays.asList(
+      Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8),
+      Arrays.asList(2, 5, 8, 1, 4, 7, 0, 3, 6),
+      Arrays.asList(8, 7, 6, 5, 4, 3, 2, 1, 0),
+      Arrays.asList(6, 3, 0, 7, 4, 1, 8, 5 ,2)
+    );
+
+    List<List<Integer>> flipPattern = Arrays.asList(
+      Arrays.asList(2, 1, 0, 5, 4, 3, 8, 7, 6),
+      Arrays.asList(0, 3, 6, 1, 4, 7, 2, 5, 8),
+      Arrays.asList(6, 7, 8, 3, 4, 5, 0, 1, 2),
+      Arrays.asList(8, 5, 2, 7, 4, 1, 6, 3, 0)
+    );
+
+    List<List<Integer>> allPattern = new ArrayList<>();
+    allPattern.addAll(rotatePattern);
+    allPattern.addAll(flipPattern);
+
+    for (int[] box : posBox) {
+      if (!boxInGoals(box)) {
+        List<int[]> board = Arrays.asList(
+          new int[]{box[0] - 1, box[1] - 1}, new int[]{box[0] - 1, box[1]}, new int[]{box[0] - 1, box[1] + 1},
+          new int[]{box[0], box[1] - 1}, new int[]{box[0], box[1]}, new int[]{box[0], box[1] + 1},
+          new int[]{box[0] + 1, box[1] - 1}, new int[]{box[0] + 1, box[1]}, new int[]{box[0] + 1, box[1] + 1}
+        );
+
+        for (List<Integer> pattern : allPattern) {
+          List<int[]> newBoard = new ArrayList<>();
+          for (int i : pattern) {
+              newBoard.add(board.get(i));
+          }
+
+          if (boxInWalls(newBoard.get(1)) && boxInWalls(newBoard.get(5))) {
+              return true;
+          } else if (inBox(newBoard.get(1), posBox) && boxInWalls(newBoard.get(2)) && boxInWalls(newBoard.get(5))) {
+              return true;
+          } else if (inBox(newBoard.get(1), posBox) && boxInWalls(newBoard.get(2)) && inBox(newBoard.get(5), posBox)) {
+              return true;
+          } else if (inBox(newBoard.get(1), posBox) && inBox(newBoard.get(2), posBox) && inBox(newBoard.get(5), posBox)) {
+              return true;
+          } else if (inBox(newBoard.get(1), posBox) && inBox(newBoard.get(6), posBox) && boxInWalls(newBoard.get(2)) && 
+                     boxInWalls(newBoard.get(3)) && boxInWalls(newBoard.get(8))) {
+              return true;
           }
         }
       }
     }
+    return false;
   }
 
-  public void undoMove(int width, int height, char[][] mapData, char[][] itemsData, char move) {
-    int x = -1; // player's x coordinate
-    int y = -1; // player's y coordinate
-
-    // Find player's position
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            if (itemsData[i][j] == '@') {
-                x = j;
-                y = i;
-            }
-        }
-    }
-
-    // Check if the player's position is valid
-    if (x >= 0 && y >= 0 && x < width && y < height) {
-        int prevX = x;
-        int prevY = y;
-
-        // Calculate the previous position based on the move
-        if (move == 'u') {
-            prevY++;
-        } else if (move == 'd') {
-            prevY--;
-        } else if (move == 'l') {
-            prevX++;
-        } else if (move == 'r') {
-            prevX--;
-        }
-
-        // Ensure the previous position is within bounds
-        if (prevX >= 0 && prevY >= 0 && prevX < width && prevY < height) {
-            // Restore the previous state of the player
-            itemsData[y][x] = '@';
-            itemsData[prevY][prevX] = ' ';
-        }
+  public static void printActions(List<Object> actions) {
+    for(Object i : actions) {
+      System.out.println(i.toString());
     }
   }
 
-  public boolean isValidState(int width, int height, char[][] mapData, char[][] itemsData) {
-    // for(int i = 0; i < height; i++) {
-    //   for(int j = 0; j < width; j++) {
-    //     return true;
-    //   }
-    // }
-    return true;
-  }
-
-  public boolean isVisited(char[][] mapData, char[][] itemsData) {
-    String gameData = gameToString(mapData) + gameToString(itemsData);
-    return visitedStates.containsKey(gameData);
-  }
-
-  public void markVisited(char[][] mapData, char[][] itemsData) {
-    String gameData = gameToString(mapData) + gameToString(itemsData);
-    visitedStates.put(gameData, true);
-  }
-
-  public String gameToString(char[][] stateData) {
-    StringBuilder stringGame = new StringBuilder();
-    for (int i = 0; i < stateData.length; i++) {
-      for (int j = 0; j < stateData[i].length; j++) {
-          stringGame.append(stateData[i][j]);
+  public static void printFrontier(Deque<List<GameState>> f) {
+    for(List<GameState> h : f) {
+      for(GameState i : h) {
+        System.out.printf("\nPlayer: %d, %d\n", i.getPlayer()[0], i.getPlayer()[1]);
+        for(int[] j : i.getBoxes()) {
+          System.out.printf("%d, %d\n", j[0], j[1]);
+        }
       }
     }
-    return stringGame.toString();
   }
+
+  public static void BFS(int[][] gameState) {
+    List<int[]> startBox = posOfBoxes(gameState);
+    int[] startPlayer = posOfPlayer(gameState);
+
+    GameState startState = new GameState(startPlayer, startBox);
+
+    Deque<List<GameState>> frontier = new LinkedList<>();
+    Deque<List<Object>> actions = new LinkedList<>();
+
+    frontier.offerLast(new ArrayList<>(Collections.singletonList(startState)));
+    actions.offerLast(new ArrayList<>(Collections.singletonList(0)));
+
+    Set<List<GameState>> exploredSet = new HashSet<>();
+
+    System.out.println("Boxes: \n");
+    for(int[] i : startBox) {
+      System.out.printf("%d, %d\n", i[0], i[1]);
+    }
+
+    System.out.println("Goals: \n");
+    for(int[] i : goals) {
+      System.out.printf("%d, %d\n", i[0], i[1]);
+    }
+
+    System.out.printf("Player: %d, %d\n", startPlayer[0], startPlayer[1]);
+
+    System.out.println("\n");
+    System.out.println("\n");
+    System.out.println("\n");
+    System.out.println("\n");
+
+    while (!frontier.isEmpty()) {
+      List<GameState> node = frontier.pollFirst();
+      List<Object> nodeAction = actions.pollFirst();
+
+      if(isEndState(node.get(node.size() - 1).getBoxes())) {
+        System.out.println("End state found!\n");
+        printActions(nodeAction);
+        break;
+      }
+
+      if(!exploredSet.contains(node)) {
+        System.out.println("Currently exploring!\n");
+        exploredSet.add(node);
+        for (List<Object> action : legalActions(node.get(node.size() - 1).getPlayer(), node.get(node.size() - 1).getBoxes())) {
+          GameState newStates = updateState(node.get(node.size() - 1).getPlayer(), node.get(node.size() - 1).getBoxes(), action);
+          if (isFailed(newStates.getBoxes())) {
+            System.out.println("Failed!\n"); 
+            continue;
+          }
+
+          System.out.println("Success!\n"); 
+          List<GameState> newNode = new ArrayList<>(node);
+          newNode.add(newStates);
+          frontier.offerLast(newNode);
+
+          List<Object> newActions = new ArrayList<>(nodeAction);
+          newActions.add(action);
+          actions.offerLast(newActions);
+        }
+      }
+      printFrontier(frontier);
+    }
+  }
+}
+
+class GameState {
+    private int[] player;
+    private List<int[]> boxes;
+
+    public GameState(int[] player, List<int[]> boxes) {
+        this.player = player;
+        this.boxes = boxes;
+    }
+
+    public int[] getPlayer() {
+        return player;
+    }
+
+    public List<int[]> getBoxes() {
+        return boxes;
+    }
 }

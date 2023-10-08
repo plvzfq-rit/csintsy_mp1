@@ -10,6 +10,7 @@ package solver;
 
 import java.lang.StringBuffer;
 import java.lang.StringBuilder;
+import java.util.ArrayList;
 
 public class StateBuilder {
     // public static void main(String[] args) {
@@ -49,7 +50,7 @@ public class StateBuilder {
 
     // }
 
-    public String createState(char[][] mapData, char[][] itemsData) {
+    public State createState(char[][] mapData, char[][] itemsData) {
         StringBuffer sb = new StringBuffer();
         int w = mapData[0].length;
         int h = mapData.length;
@@ -71,22 +72,21 @@ public class StateBuilder {
 
         }
 
-        return String.format("%d%d%s", h, w, sb.toString());
+        State state = new State(sb.toString(), h, w);
+        return state;
     }
 
-    public String moveState(String state, char direction) {
+    public State moveState(State state, char direction) {
         int moveIndex = 0, movePlusIndex = 0;
-        int playerIndex = Math.max(state.indexOf('0'), state.indexOf('@'));
+        int playerIndex = Math.max(state.data.indexOf('0'), state.data.indexOf('@'));
         char variations[] = new char[3];
-        int h = Character.getNumericValue(state.charAt(0));
-        int w = Character.getNumericValue(state.charAt(1));
-        int upper = h * w + 1;
-        int lower = 2;
-        StringBuilder sb = new StringBuilder(state);
+        int upper = state.h * state.w - 1;
+        int lower = 0;
+        StringBuilder sb = new StringBuilder(state.data);
         switch(direction) {
             case 'u':
-                moveIndex = playerIndex - w;
-                movePlusIndex = moveIndex - w;
+                moveIndex = playerIndex - state.w;
+                movePlusIndex = moveIndex - state.w;
 
                 variations[0] = sb.charAt(playerIndex);
                 variations[1] = sb.charAt(moveIndex);
@@ -101,8 +101,8 @@ public class StateBuilder {
                 variations[2] = (movePlusIndex >= lower) ? sb.charAt(movePlusIndex) : '#';
                 break;
             case 'd':
-                moveIndex = playerIndex + w;
-                movePlusIndex = moveIndex + w;
+                moveIndex = playerIndex + state.w;
+                movePlusIndex = moveIndex + state.w;
 
                 variations[0] = sb.charAt(playerIndex);
                 variations[1] = sb.charAt(moveIndex);
@@ -153,19 +153,45 @@ public class StateBuilder {
         if (movePlusIndex >= lower && movePlusIndex <= upper)
             sb.setCharAt(movePlusIndex, variations[2]);
 
-        return sb.toString();
+        return new State(sb.toString(), state.h, state.w);
     }
 
-    public void printState(String state) {
-        int h  = Character.getNumericValue(state.charAt(0));
-        int w = Character.getNumericValue(state.charAt(1));
-
+    public void printState(State state) {
+        int h = state.h;
+        int w = state.w;
         for (int i = 2; i < h * w + 1; i++) {
             if ((i - 2) % w == 0) System.out.print("\n");
 
-            System.out.print(state.charAt(i));
+            System.out.print(state.data.charAt(i));
         }
 
         System.out.print("\n\n");
     } 
+
+    public String getBoxPositions(State state) {
+        String data = state.data;
+        String pos = "";
+        for (int i = 0; i < data.length(); i++) {
+            if ("$*.@0".contains(Character.toString(data.charAt(i)))) {
+                pos += String.format("%03d", i);
+            }
+        }
+        
+        return pos;
+    }
+
+    // public ArrayList<State> generateInvalidStates(State state) {
+    //     String data = state.data;
+    //     ArrayList<Integer> possibleInd = new ArrayList<>();
+    //     for (int i = 0; i < data.length(); i++) {
+    //         if (data.charAt(i) == ' ') {
+    //             String c =  String.format("%c%c%c%c", data.charAt(i - state.w), data.charAt(i - 1), data.charAt(i + state.w), data.charAt(i + 1));
+
+    //             if (c.contains("##") || (c.charAt(0) == '#' && c.charAt(3) == '#')) 
+    //                 possibleInd.add(i);
+    //         }
+    //     }
+
+
+    // }
 }

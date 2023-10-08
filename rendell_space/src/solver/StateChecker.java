@@ -1,26 +1,26 @@
 package solver;
 
 public class StateChecker {
-    public boolean isStateSolved(String state) {
-        for (char i : state.toCharArray()) {
+    public boolean isStateSolved(State state) {
+        for (char i : state.data.toCharArray()) {
             if (i == '$' || i == '.') return false;
         }
 
         return true;
     }
 
-    public boolean isStateUnsolvable(String state) {
-        char[] state_ = state.toCharArray();
-        int h = Character.getNumericValue(state_[0]);
-        int w = Character.getNumericValue(state_[1]);
-        int upper = h * w + 1;
+    public boolean isStateUnsolvable(State state) {
+        int h = state.h;
+        int w = state.w;
+        int upper = h * w - 1;
+        String data = state.data;
 
-        for (int i = 2; i < upper; i++) {
-            if (state_[i] == '$') {
-                char[] c = { state_[i - w], state_[i - 1], state_[i + w], state_[i + 1] };
-                String check = new String(c);
+        for (int i = 0; i < upper; i++) {
+            if (data.charAt(i) == '$') {
+                // char[] c = { state_[i - w], state_[i - 1], state_[i + w], state_[i + 1] };
+                String c =  String.format("%c%c%c%c", data.charAt(i - w), data.charAt(i - 1), data.charAt(i + w), data.charAt(i + 1));
 
-                if (check.contains("##") || (c[0] == '#' && c[3] == '#')) 
+                if (c.contains("##") || (c.charAt(0) == '#' && c.charAt(3) == '#')) 
                     return true;
             }
         }

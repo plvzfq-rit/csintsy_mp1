@@ -9,52 +9,72 @@ public class SokobanDp {
 
     public static StateBuilder sb = new StateBuilder();
     public static StateChecker sc = new StateChecker();
-    public static HashMap<String, StringBuilder> memo = new HashMap<>();
     public static ArrayList<String> visited = new ArrayList<>();
+    public static boolean found = false;
 
     // public static void main(String[] args) {
-    //     char[][] mapData =  {{' ', '#', '#', '#', '#', '#', '#'},
-    //     {' ', '#', ' ', ' ', '.', ' ', '#'},
-    //     {'#', '#', ' ', ' ', ' ', ' ', '#'},
-    //     {'#', '.', '.', ' ', '.', ' ', '#'},
-    //     {'#', '#', '#', '#', '#', '#', '#'}};
+    //     char[][] mapData = {
+    //         {' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    //         {' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    //         {' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    //         {' ', ' ', '#', '#', '#', ' ', ' ', ' ', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    //         {' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    //         {'#', '#', '#', ' ', '#', ' ', '#', '#', ' ', '#', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#'},
+    //         {'#', ' ', ' ', ' ', '#', ' ', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', ' ', '.', '.', '#'},
+    //         {'#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '.', '.', '#'},
+    //         {'#', '#', '#', '#', '#', ' ', '#', '#', '#', ' ', '#', ' ', '#', '#', ' ', ' ', '.', '.', '#'},
+    //         {' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#'},
+    //         {' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '}
+    //     };
+    //     char[][] itemsData= {
+    //         {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    //         {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    //         {' ', ' ', ' ', ' ', ' ', '$', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    //         {' ', ' ', ' ', ' ', ' ', ' ', ' ', '$', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    //         {' ', ' ', ' ', ' ', ' ', '$', ' ', '$', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    //         {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    //         {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    //         {' ', ' ', '$', ' ', ' ', '$', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    //         {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '@', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    //         {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    //         {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '}
+    //     };
+    //     SokobanDp sd = new SokobanDp();
 
-    //     char[][] itemsData= {{' ', ' ', ' ', ' ', ' ', ' ', ' '},
-    //     {' ', ' ', '@', ' ', ' ', ' ', ' '},
-    //     {' ', ' ', '$', '$', '$', ' ', ' '},
-    //     {' ', ' ', ' ', ' ', '$', ' ', ' '},
-    //     {' ', ' ', ' ', ' ', ' ', ' ', ' '}};
 
+    //     State state = sb.createState(mapData, itemsData);
 
-    //     String state = sb.createState(mapData, itemsData);
-
-    //     System.out.println(SokobanDpSolver(state).toString());
+    //     System.out.println(sd.SokobanDpSolver(state));
     // }
 
-    public String SokobanDpSolver(String state) {
-        if (sc.isStateSolved(state)) return new String();
-        if (sc.isStateUnsolvable(state)) return null;
+    public String SokobanDpSolver(State state) {
+        if (found) {
+            // System.out.println("NO WAY");
+            return null;
+        }
 
-        if (visited.contains(state)) return null;
-        else visited.add(state);
+        if (sc.isStateSolved(state)) {
+            found = true;
+            return new String();
+        }
 
-        String u = SokobanDpSolver(sb.moveState(state, 'u'));
-        String d = SokobanDpSolver(sb.moveState(state, 'd'));
-        String l = SokobanDpSolver(sb.moveState(state, 'l'));
-        String r = SokobanDpSolver(sb.moveState(state, 'r'));
+        if (sc.isStateUnsolvable(state)) return null; 
 
-        if (u != null) {
-            return "u" + u;
+        // System.out.println(sb.getBoxPositions(state));
+        if (visited.contains(state.data)) return null;
+        else visited.add(state.data);
+
+        String solutions[] = {SokobanDpSolver(sb.moveState(state, 'u')), SokobanDpSolver(sb.moveState(state, 'd')), SokobanDpSolver(sb.moveState(state, 'l')), SokobanDpSolver(sb.moveState(state, 'r'))};
+        String directions[] = {"u", "d", "l", "r"};
+
+        int shortest = 0;
+        for (int i = 0; i < 4; i++) {
+            if (solutions[shortest] == null || (solutions[i] != null && solutions[i].length() < solutions[shortest].length()))
+                shortest = i; 
         }
-        if (d != null) {
-            return "d" + d;
-        }
-        if (l != null) {
-            return "l" + l;
-        }
-        if (r != null) {
-            return "r" + r;
-        }
+        
+        if (solutions[shortest] != null)
+            return directions[shortest] + solutions[shortest];
         
         return null;
     }

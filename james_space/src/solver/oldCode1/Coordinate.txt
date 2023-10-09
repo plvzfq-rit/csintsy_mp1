@@ -10,16 +10,16 @@ public class Coordinate {
     }
 
     public Coordinate(Coordinate c, Direction d) {
-        if (d == Direction.u) {
+        if (d == Directions.UP) {
             this.x = c.getX();
             this.y = c.getY() - 1;
-        } else if (d == Direction.d) {
+        } else if (d == Directions.DOWN) {
             this.x = c.getX();
             this.y = c.getY() + 1;
-        } else if (d == Direction.l) {
+        } else if (d == Directions.LEFT) {
             this.x = c.getX() - 1;
             this.y = c.getY();
-        } else if (d == Direction.r) {
+        } else if (d == Directions.RIGHT) {
             this.x = c.getX() + 1;
             this.y = c.getY();
         }
@@ -33,11 +33,7 @@ public class Coordinate {
         return this.y;
     }
 
-    public int toIntForm (int width) {
-        return width * this.y + this.x;
-    }
-
-    public String toStringForm () {
+    public String toCustomString () {
         return "(" + this.x + "," + this.y + ")";
     }
 }

@@ -24,7 +24,7 @@ public class NodeFunctions {
                                     new Coordinate(node.getPlayerCoordinate(), direction), 
                                     NodeFunctions.generateNewBoxCoordinates(node.getPlayerCoordinate(), 
                                                                             direction, 
-                                                                            goalCoordinates), 
+                                                                            node.getBoxCoordinates()), 
                                     goalCoordinates, 
                                     direction, 
                                     mapData,
@@ -67,7 +67,8 @@ public class NodeFunctions {
         List<Coordinate> updatedBoxCoordinates = new ArrayList<>();
         Coordinate newPlayerPosition = new Coordinate(playerCoordinate, direction);
         for (Coordinate coordinate : boxCoordinates) {
-            if (coordinate.equals(newPlayerPosition)) {
+            if (coordinate.getX() == newPlayerPosition.getX() &&
+                coordinate.getY() == newPlayerPosition.getY()) {
                 updatedBoxCoordinates.add(new Coordinate(newPlayerPosition, direction));
             }
             else {

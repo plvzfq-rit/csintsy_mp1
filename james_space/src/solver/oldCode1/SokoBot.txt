@@ -1,0 +1,132 @@
+package solver;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+/*
+ * LEGEND:
+ * @ - player - in itemsData
+ * # - wall - in mapData
+ * $ - box - in itemsData
+ * . - goal square - in mapData
+ */
+
+public class SokoBot {
+    Coordinate initialPlayerCoordinates;
+    List<Coordinate> initialBoxCoordinates = new ArrayList<Coordinate>();
+    List<Coordinate> goalCoordinates = new ArrayList<Coordinate>();
+
+  public String solveSokobanPuzzle(int width, int height, char[][] mapData, char[][] itemsData) {
+    this.initializeBot(width, height, mapData, itemsData);
+    return aStarSearch(width, height, mapData, itemsData);
+  }
+
+  public void initializeBot (int width, int height, char[][] mapData, char[][] itemsData) {
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            if (itemsData[i][j] == '@') {
+                this.initialPlayerCoordinates = new Coordinate(i, j);
+            }
+            if (itemsData[i][j] == '$') {
+                this.initialBoxCoordinates.add(new Coordinate(i, j));
+            }
+            if (mapData[i][j] == '.') {
+                this.goalCoordinates.add(new Coordinate(i, j));
+            }
+        }
+    }
+  }
+
+  public String aStarSearch (int width, int height, char[][] mapData, char[][] itemsData) {
+    PriorityQueue<Node> frontier = new PriorityQueue<Node>(new NodeComparator());
+    HashSet<String> visitedMemory = new HashSet<String>();
+    HashMap<String, Double> visitedNodeToCost = new HashMap<String, Double>();
+    HashSet<String> frontierMemory = new HashSet<String>();
+    Node currentNode;
+    // List<Node> viableNodes;
+    String path = "";
+    frontier.add(new Node (this.initialPlayerCoordinates, 
+                           this.initialBoxCoordinates, 
+                           this.goalCoordinates, 
+                           mapData, 
+                           itemsData));
+
+    while (!frontier.isEmpty() && path.isEmpty()) {
+      currentNode = frontier.poll();
+      // System.out.println(currentNode.getNodeState().toCustomString());
+      displayNodeState(width, height, currentNode.getNodeState());
+      if (isGoal(currentNode.getBoxCoordinates())) {
+        path = currentNode.getPath();
+      }
+      else {
+        visitedMemory.add(currentNode.getNodeState().toCustomString());
+        double costToNext = currentNode.getCumulativeCost() + 1;
+        List<Node> childNodes = NodeFunctions.generateChildNodes(currentNode, mapData, itemsData, goalCoordinates);
+        for (Node childNode : childNodes) {
+          String childNodeIdentifier = childNode.getNodeState().toCustomString();
+          boolean nodeInFrontier = frontierMemory.contains(childNodeIdentifier);
+          boolean nodeInVisited = visitedMemory.contains(childNodeIdentifier);
+
+          if (nodeInFrontier) {
+            if (visitedNodeToCost.get(childNodeIdentifier) != null) {
+              if (visitedNodeToCost.get(childNodeIdentifier) > costToNext) {
+                frontierMemory.remove(childNodeIdentifier);
+                nodeInFrontier = !nodeInFrontier;
+              }
+            }
+          }
+
+          if (nodeInVisited) {
+            if (visitedNodeToCost.get(childNodeIdentifier) != null) {
+              if (visitedNodeToCost.get(childNodeIdentifier) > costToNext) {
+                visitedMemory.remove(childNodeIdentifier);
+                nodeInVisited = !nodeInVisited;
+              }
+            }
+          }
+
+          if (!nodeInFrontier && !nodeInVisited) {
+            visitedNodeToCost.put(childNodeIdentifier, costToNext);
+            frontierMemory.add(childNodeIdentifier);
+            frontier.add(childNode);
+          }
+        }
+      }
+    }
+    
+    return path;
+  }
+
+  public boolean isGoal (List<Coordinate> boxCoordinates) {
+    return this.convertCoordinateListToStringSet(boxCoordinates).equals(this.convertCoordinateListToStringSet(this.goalCoordinates));
+  }
+
+  private HashSet<String> convertCoordinateListToStringSet (List<Coordinate> coordinates) {
+    //System.out.println(coordinates.stream().map(Coordinate::toCustomString).collect(Collectors.joining(",")));
+    return coordinates.stream().map(Coordinate::toCustomString).collect(Collectors.toCollection(HashSet::new));
+  }
+
+  private void displayNodeState (int width, int height, NodeState nodeState) {
+    for (int i = 0; i < height; i++) {
+      for (int j = 0; j < width; j++) {
+        if (j == nodeState.getPlayerCoordinate().getX() && i == nodeState.getPlayerCoordinate().getY()) {
+          System.out.print("@");
+        }
+        else {
+          boolean found = false;
+          for (Coordinate c : nodeState.getBoxCoordinates()) {
+            found = j == c.getX() && i == c.getY();
+          }
+          if (found) {
+            System.out.print("$");
+          }
+          else {
+            System.out.print("*");
+          }
+        }
+      }
+      System.out.println();
+    }
+  }
+
+}

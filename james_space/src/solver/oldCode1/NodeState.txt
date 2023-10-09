@@ -1,6 +1,7 @@
 package solver;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class NodeState {
     Coordinate playerCoordinate;
@@ -17,5 +18,10 @@ public class NodeState {
 
     public List<Coordinate> getBoxCoordinates () {
         return this.boxCoordinates;
+    }
+
+    public String toCustomString () {
+        return playerCoordinate.toCustomString() + ", [" + 
+               this.boxCoordinates.stream().map(Coordinate::toCustomString).collect(Collectors.joining(",")) + "]";
     }
 }

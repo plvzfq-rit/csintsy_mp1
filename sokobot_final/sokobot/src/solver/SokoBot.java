@@ -29,12 +29,9 @@ public class SokoBot {
             }
 
             ArrayList<BoxMove> boxMoves=BoxMoveAStar(mapData, itemsData);
-            for (BoxMove bm : boxMoves) {
-                System.out.println(bm);
-            }
             StringBuilder sb = new StringBuilder();
             interpretBoxMoves(mapData1, itemsData1, boxMoves, sb);
-            System.out.println(sb.toString());
+            //System.out.println(sb.toString());
             return sb.toString();
 
         } catch (Exception e) {
@@ -52,24 +49,12 @@ public class SokoBot {
             playerAStar(mapData, itemsData, bm, player, goal, sb);
             sb.append(bm.dir);
             itemsData=newState(itemsData, bm);
-                System.out.println("qwertyuiop");
-
-                for (int i = 0 ; i < itemsData.length; i++) {
-                    for (int j = 0; j < itemsData[0].length; j++) {
-                        if (mapData[i][j] == '#' || mapData[i][j] == '.')
-                            System.out.print(mapData[i][j]);
-                        else
-                            System.out.print(itemsData[i][j]);
-                    }
-                    System.out.println();
-                }
         }
     }
 
     public static void playerAStar(char[][] mapData, char[][] itemsData, BoxMove bm, Coord player, Coord goal, StringBuilder sb){
 
         if(player.equals(goal)){
-            System.out.println("ded");
             return;
         }
 
@@ -102,47 +87,47 @@ public class SokoBot {
                 MoveNode cur = currentNode.parent;
                 while(cur!=null){
 
-                    Coord curC = cur.coords;
-                    Coord prevC = prev.coords;
+                  Coord curC = cur.coords;
+                  Coord prevC = prev.coords;
 
-                    if(curC.c<prevC.c){
-                        stack.add('r');
-                    }
-                    if(curC.c>prevC.c){
-                        stack.add('l');
-                    }
-                    if(curC.r<prevC.r){
-                        stack.add('d');
-                    }
-                    if(curC.r>prevC.r){
-                        stack.add('u');
-                    }
+                  if(curC.c<prevC.c){
+                      stack.add('r');
+                  }
+                  if(curC.c>prevC.c){
+                      stack.add('l');
+                  }
+                  if(curC.r<prevC.r){
+                      stack.add('d');
+                  }
+                  if(curC.r>prevC.r){
+                      stack.add('u');
+                  }
 
-                    prev=cur;
-                    cur = cur.parent;
-                }
+                  prev=cur;
+                  cur = cur.parent;
+              }
 
-                Coord curC = root.coords;
-                    Coord prevC = prev.coords;
+              Coord curC = root.coords;
+                  Coord prevC = prev.coords;
 
-                    if(curC.c<prevC.c){
-                        stack.add('r');
-                    }
-                    if(curC.c>prevC.c){
-                        stack.add('l');
-                    }
-                    if(curC.r<prevC.r){
-                        stack.add('d');
-                    }
-                    if(curC.r>prevC.r){
-                        stack.add('u');
-                    }
+                  if(curC.c<prevC.c){
+                      stack.add('r');
+                  }
+                  if(curC.c>prevC.c){
+                      stack.add('l');
+                  }
+                  if(curC.r<prevC.r){
+                      stack.add('d');
+                  }
+                  if(curC.r>prevC.r){
+                      stack.add('u');
+                  }
 
-                while(!stack.isEmpty()){
-                    sb.append(stack.pop());
-                }
-                continue;
-            }
+              while(!stack.isEmpty()){
+                  sb.append(stack.pop());
+              }
+              continue;
+          }
 
             Coord[] neighbours = current.getUDLRCoords();
 
@@ -159,14 +144,6 @@ public class SokoBot {
             }
         }
 
-            if(!found){
-                System.out.println(goal+" was never found.");
-            }
-            else{
-                System.out.println(goal+" was found.");
-
-            }
-            System.out.println( "Searched "+count+" spaces");
             
     }
     public static boolean isOpen(char c) {
@@ -188,16 +165,6 @@ public class SokoBot {
         BoxMove.getAllItemsCoordinates(mapData, itemsData, boxes, goals);
 
         boolean[][] deadzone = generateDeadzone(mapData);
-
-        for (int i = 0; i < deadzone.length; i++) {
-            for (int j = 0; j < deadzone[0].length; j++) {
-                if (deadzone[i][j])
-                System.out.print('x');
-                else
-                System.out.print('.');
-            }
-            System.out.println();
-        }
 
         Node root = new Node (
             boxes, null, new BoxMove(' ', player), 
@@ -225,19 +192,6 @@ public class SokoBot {
                 while (current.gCost != 0) {
                     backtrack.add(current.move);
                     current = current.parent;
-                }
-
-
-                System.out.println("I WIN");
-
-                for (int i = 0 ; i < check.length; i++) {
-                    for (int j = 0; j < check[0].length; j++) {
-                        if (mapData[i][j] == '#' || mapData[i][j] == '.')
-                            System.out.print(mapData[i][j]);
-                        else
-                            System.out.print(check[i][j]);
-                    }
-                    System.out.println();
                 }
 
                 return backtrack;

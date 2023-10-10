@@ -69,14 +69,12 @@ public class SokoBot {
         HashSet<Coord> visited = new HashSet<>();
 
         boolean found = false;
-        int count = 0;
 
 
         while(!open.isEmpty()&&found==false){
             MoveNode currentNode = open.poll();
             Coord current =currentNode.coords;
             visited.add(current);
-            count++;
 
             if(current.equals(goal)){
                 found = true;
@@ -176,8 +174,6 @@ public class SokoBot {
         HashSet<Node> closed = new HashSet<>();
         ArrayList<BoxMove> backtrack = new ArrayList<>();
 
-        char[][] check = null;
-
         open.add(root);
 
         while (!open.isEmpty()) {
@@ -188,7 +184,6 @@ public class SokoBot {
             // backtracks so sequence of boxmoves is in reverse order
             // current.hCost == 0 ??
             if (current.hCost == 0) {
-                check = current.itemsData;
                 while (current.gCost != 0) {
                     backtrack.add(current.move);
                     current = current.parent;
@@ -243,14 +238,12 @@ public class SokoBot {
 
       int sum =0;
       int inGoal = 0;
-      int max = 0;
 
       for (Coord box : boxes) {
           int lowest = Coord.manhattanDist(box, goals[0]);
           for (Coord goal : goals) {
               int cur = Coord.manhattanDist(box, goal);
               if(cur<lowest)lowest=cur;
-              if (cur > max) max = cur;
           }
           if (lowest == 0) inGoal++;
           sum+=lowest;
@@ -264,7 +257,7 @@ public class SokoBot {
 
       return sum + k;
 
-      // return anneal.anneal(1000, boxes.length, 100, boxes, goals) + k;
+    //   return anneal.anneal(1000, boxes.length, 100, boxes, goals) + k;
   }
 
 
@@ -300,20 +293,8 @@ public class SokoBot {
         return newState;
     }
 
-    public static boolean isGoal(char[][] mapData, Node n) {
-        for (int i = 0; i < n.itemsData.length; i++) {
-            for (int j = 0; j < n.itemsData[0].length; j++) {
-                if (n.itemsData[i][j] == '$' && mapData[i][j] != '.') {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
     public static boolean isFreezeDeadlock(char[][] mapData, char[][] itemsData, Coord box, ArrayList<Coord> visited) {
-
+        // TODO if not busy
         return false;
     }
 

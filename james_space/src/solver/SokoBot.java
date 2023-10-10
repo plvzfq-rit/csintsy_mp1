@@ -1,23 +1,39 @@
 package solver;
 
+import java.util.HashSet;
+
 public class SokoBot {
 
+  int playerCoordinates;
+  HashSet<Integer> boxCoordinates = new HashSet<>();
+  HashSet<Integer> goalCoordinates = new HashSet<>();
+  
+
   public String solveSokobanPuzzle(int width, int height, char[][] mapData, char[][] itemsData) {
-    /*
-     * YOU NEED TO REWRITE THE IMPLEMENTATION OF THIS METHOD TO MAKE THE BOT SMARTER
-     */
-    /*
-     * Default stupid behavior: Think (sleep) for 3 seconds, and then return a
-     * sequence
-     * that just moves left and right repeatedly.
-     */
-    try {
-      Thread.sleep(3000);
-    } catch (Exception ex) {
-      ex.printStackTrace();
+
+    StateBuilder sb = new StateBuilder();
+    
+    HashSet<Integer> boxCoordinates = new HashSet<>();
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            if (itemsData[y][x] == '@') {
+              playerCoordinates = sb.computeCoordinate(x, y, width);
+            }
+            if (itemsData[y][x] == '$') {
+              boxCoordinates.add(sb.computeCoordinate(x, y, width));
+            }
+            if (mapData[y][x] == '.') {
+              goalCoordinates.add(sb.computeCoordinate(x, y, width));
+            }
+        }
     }
-    return "lrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlrlr";
+
+    State initialState = new State (width, height, playerCoordinates, boxCoordinates);
+
+    // SokobanDp sd = new SokobanDp();
+
+    return "";
+    // return sd.SokobanDpSolver(state);
   }
-
 }
-

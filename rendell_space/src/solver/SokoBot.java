@@ -1,21 +1,11 @@
 package solver;
-
+import java.util.ArrayList;
 public class SokoBot {
 
   public String solveSokobanPuzzle(int width, int height, char[][] mapData, char[][] itemsData) {
 
-    // try {
-    //   Thread.sleep(3000);
-    // } catch (Exception ex) {
-    //   ex.printStackTrace();
-    // }
+    ArrayList<BoxMove> bm = Solver.AStar(mapData, itemsData);
 
-    StateBuilder sb = new StateBuilder();
-    SokobanDp sd = new SokobanDp();
-    State state = sb.createState(mapData, itemsData);
-
-
-
-    return sd.SokobanDpSolver(state);
+    return PAStar.aStar(mapData, itemsData, bm, bm.size() - 1, new StringBuilder());
   }
 }

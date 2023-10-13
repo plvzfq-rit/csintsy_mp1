@@ -1,4 +1,5 @@
 package solver;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,44 +10,29 @@ public class BoxMove {
     char dir;
     Coord coord;
 
-    // public static void main(String[] args) {
-    //     try {
-
-    //         MapImporter mi = MapImporter.getDataFromFile("threeboxes1");
-    //         char[][] mapData = mi.mapData;
-    //         char[][] itemsData = mi.itemsData;
-
-    //         for (BoxMove bm : generateBoxMoves(mapData, itemsData)) {
-    //             System.out.println(bm);
-    //         }
-
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //     }
-    // }
-
     public BoxMove(char dir, Coord coord) {
         this.dir = dir;
         this.coord = coord;
     }
 
-    public static ArrayList<BoxMove> generateBoxMoves(char[][] mapData, char[][] itemsData, Coord player, Coord[] allBoxCoords, boolean[][] deadlock) {
+    public static ArrayList<BoxMove> generateBoxMoves(char[][] mapData, char[][] itemsData, Coord player,
+            Coord[] allBoxCoords, boolean[][] deadlock) {
         /// return this
         ArrayList<BoxMove> boxPushes = new ArrayList<>();
 
         // for each box coordinate
-        // filter NWSE for either 
+        // filter NWSE for either
         // BLOCKED or opposite of a blocked tile
         HashMap<BoxMove, Coord> possibleBoxPushes = new HashMap<>();
         Coord c1, c2;
 
         for (Coord box : allBoxCoords) {
             Coord[] UDLR = box.getUDLRCoords();
-            
+
             c1 = UDLR[0];
             c2 = UDLR[1];
             if (isOpen(mapData[c1.r][c1.c]) && isOpen(itemsData[c1.r][c1.c])
-            && isOpen(mapData[c2.r][c2.c]) && isOpen(itemsData[c2.r][c2.c])) {
+                    && isOpen(mapData[c2.r][c2.c]) && isOpen(itemsData[c2.r][c2.c])) {
                 if (!deadlock[c2.r][c2.c])
                     possibleBoxPushes.put(new BoxMove('d', box), c1);
                 if (!deadlock[c1.r][c1.c])
@@ -56,7 +42,7 @@ public class BoxMove {
             c1 = UDLR[2];
             c2 = UDLR[3];
             if (isOpen(mapData[c1.r][c1.c]) && isOpen(itemsData[c1.r][c1.c])
-            && isOpen(mapData[c2.r][c2.c]) && isOpen(itemsData[c2.r][c2.c])) {
+                    && isOpen(mapData[c2.r][c2.c]) && isOpen(itemsData[c2.r][c2.c])) {
                 if (!deadlock[c2.r][c2.c])
                     possibleBoxPushes.put(new BoxMove('r', box), c1);
                 if (!deadlock[c1.r][c1.c])
@@ -70,7 +56,7 @@ public class BoxMove {
 
         queue.add(player);
 
-        while (!queue.isEmpty()) {            
+        while (!queue.isEmpty()) {
             Coord curr = queue.removeLast();
             visited.add(curr);
 
@@ -105,7 +91,7 @@ public class BoxMove {
     }
 
     public static void getAllItemsCoordinates(char[][] mapData, char[][] itemsData, Coord[] boxes, Coord[] goals) {
-        
+
         int b = 0;
         int g = 0;
 
@@ -134,5 +120,3 @@ public class BoxMove {
         return String.format("%s %c", coord.toString(), dir);
     }
 }
-
-

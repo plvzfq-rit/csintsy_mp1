@@ -91,16 +91,14 @@ public class Solver {
     public static int HFunction(Coord[] boxes, Coord[] goals) {
         //replace by passing list of items and list and maps
 
-        int sum =0;
+        int sum = 0;
         int inGoal = 0;
-        int max = 0;
 
         for (Coord box : boxes) {
             int lowest = Coord.manhattanDist(box, goals[0]);
             for (Coord goal : goals) {
                 int cur = Coord.manhattanDist(box, goal);
                 if(cur<lowest)lowest=cur;
-                if (cur > max) max = cur;
             }
             if (lowest == 0) inGoal++;
             sum+=lowest;

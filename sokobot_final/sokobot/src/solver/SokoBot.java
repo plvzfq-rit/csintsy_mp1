@@ -246,9 +246,7 @@ public class SokoBot {
             sum += lowest;
         }
 
-        int k = (boxes.length - inGoal) * boxes.length * boxes.length * boxes.length;
-
-        return sum + k;
+        return sum + (boxes.length - inGoal) * boxes.length * boxes.length;
 
         // return anneal.anneal(1000, boxes.length, 100, boxes, goals) + k;
     }

@@ -182,6 +182,7 @@ public class SokoBot {
                     deadzone)) {
                 Coord[] newBoxes = new Coord[boxes.length];
                 Coord prevBox = move.coord;
+                Coord boxMoved = null;
 
                 for (int i = 0; i < boxes.length; i++) {
                     newBoxes[i] = new Coord(current.boxes[i]);
@@ -201,15 +202,23 @@ public class SokoBot {
                                 newBoxes[i].c += 1;
                                 break;
                         }
+                        boxMoved = newBoxes[i];
                     }
                 }
 
-                Node child = new Node(newBoxes, current, move, newState(current.itemsData, move), current.gCost + 1,
+                char[][] newState = newState(current.itemsData, move);
+
+                Node child = new Node(newBoxes, current, move, newState, current.gCost + 1,
                         HFunction(newBoxes, goals));
 
                 // see if child is open or closed already
                 // ArrayList<Coord> visited = new ArrayList<>();
                 if (open.contains(child) || closed.contains(child)) {
+                    continue;
+                }
+
+                if (FreezeLocks.isFreeze(mapData, newState, boxMoved, new ArrayList<Coord>(), deadzone)) {
+                    closed.add(child);
                     continue;
                 }
 
@@ -274,11 +283,6 @@ public class SokoBot {
         }
 
         return newState;
-    }
-
-    public static boolean isFreezeDeadlock(char[][] mapData, char[][] itemsData, Coord box, ArrayList<Coord> visited) {
-        // TODO if not busy
-        return false;
     }
 
     public static boolean[][] generateDeadzone(char[][] mapData) {

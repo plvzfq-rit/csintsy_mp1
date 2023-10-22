@@ -1,0 +1,130 @@
+twoboxes1
+Boxes: 2
+** 29 Player Moves, 9 Box Moves
+Unique States Evaluated: 15
+Total Squares: 13
+Open Squares: 7
+Deadlock Squares: 6
+Pruned Frozen States: 1
+Runtime: 0.007s
+
+twoboxes2
+Boxes: 2
+** 50 Player Moves, 18 Box Moves
+Unique States Evaluated: 63
+Total Squares: 19
+Open Squares: 10
+Deadlock Squares: 9
+Pruned Frozen States: 0
+Runtime: 0.011s
+
+twoboxes3
+Boxes: 2
+** 50 Player Moves, 18 Box Moves
+Unique States Evaluated: 62
+Total Squares: 16
+Open Squares: 9
+Deadlock Squares: 7
+Pruned Frozen States: 1
+Runtime: 0.017s
+
+threeboxes1
+Boxes: 3
+** 102 Player Moves, 26 Box Moves
+Unique States Evaluated: 393
+Total Squares: 20
+Open Squares: 13
+Deadlock Squares: 7
+Pruned Frozen States: 54
+Runtime: 0.027s
+
+threeboxes2
+Boxes: 3
+** 159 Player Moves, 53 Box Moves
+Unique States Evaluated: 1159
+Total Squares: 28
+Open Squares: 15
+Deadlock Squares: 13
+Pruned Frozen States: 19
+Runtime: 0.045s
+
+threeboxes3
+Boxes: 3
+** 121 Player Moves, 20 Box Moves
+Unique States Evaluated: 103
+Total Squares: 20
+Open Squares: 10
+Deadlock Squares: 10
+Pruned Frozen States: 3
+Runtime: 0.015s
+
+fourboxes1
+Boxes: 4
+** 99 Player Moves, 24 Box Moves
+Unique States Evaluated: 663
+Total Squares: 18
+Open Squares: 16
+Deadlock Squares: 2
+Pruned Frozen States: 209
+Runtime: 0.037s
+
+fourboxes2
+Boxes: 4
+** 176 Player Moves, 58 Box Moves
+Unique States Evaluated: 5142
+Total Squares: 30
+Open Squares: 16
+Deadlock Squares: 14
+Pruned Frozen States: 173
+Runtime: 0.195s
+
+fourboxes3
+Boxes: 4
+** 231 Player Moves, 75 Box Moves
+Unique States Evaluated: 6495
+Total Squares: 32
+Open Squares: 18
+Deadlock Squares: 14
+Pruned Frozen States: 454
+Runtime: 0.266s
+
+fiveboxes1
+Boxes: 5
+** 120 Player Moves, 37 Box Moves
+Unique States Evaluated: 2696
+Total Squares: 29
+Open Squares: 19
+Deadlock Squares: 10
+Pruned Frozen States: 255
+Runtime: 0.132s
+
+fiveboxes2
+Boxes: 5
+** 191 Player Moves, 36 Box Moves
+Unique States Evaluated: 2854
+Total Squares: 27
+Open Squares: 21
+Deadlock Squares: 6
+Pruned Frozen States: 206
+Runtime: 0.127s
+
+fiveboxes3
+Boxes: 5
+** 252 Player Moves, 71 Box Moves
+Unique States Evaluated: 34584
+Total Squares: 30
+Open Squares: 20
+Deadlock Squares: 10
+Pruned Frozen States: 798
+Runtime: 3.145s
+
+original1
+Boxes: 6
+** 358 Player Moves, 99 Box Moves
+Unique States Evaluated: 1201
+Total Squares: 56
+Open Squares: 41
+Deadlock Squares: 15
+Pruned Frozen States: 332
+Runtime: 0.16s
+
